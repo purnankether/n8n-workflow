@@ -1,0 +1,352 @@
+{
+  "name": "OwnRAGwithAIPrompt",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "3fda2a73-30d5-4a7d-af79-289161e43baa",
+      "name": "Chat Trigger",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        848
+      ],
+      "webhookId": "bd5e7331-04cc-4623-9331-fc8d31ab9981"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful AI assistant with access to a knowledge base. Use the vector store tool to search for relevant information when answering user questions. Always cite the information you retrieve."
+        }
+      },
+      "id": "caebefef-05a2-4a52-9354-db87f5079439",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -208,
+        848
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "e0856186-4878-4dcf-b593-316bc80f240c",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -256,
+        1072
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "1ad16b93-01b6-498a-b7fd-b8bec5819ec4",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -128,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Search the knowledge base for relevant information to answer user questions",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        },
+        "topK": 3
+      },
+      "id": "21feb0a7-7575-44a7-b9b6-3d3128511666",
+      "name": "Vector Store (Retrieval)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        1072
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ab2cda54-c397-41a8-b173-c6c1d8b754e6",
+      "name": "Embeddings OpenAI (Query)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        80,
+        1280
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "id-1",
+              "name": "pageContent",
+              "value": "Sample document 1: n8n is a workflow automation platform that allows you to connect different services and automate tasks.",
+              "type": "string"
+            },
+            {
+              "id": "id-2",
+              "name": "metadata",
+              "value": "={{ { source: 'sample_doc_1', category: 'introduction' } }}",
+              "type": "object"
+            },
+            {
+              "id": "70db5958-c4a0-421d-aa77-a5d9ddcd4e96",
+              "name": "HCL",
+              "value": "MASTER SERVICES AGREEMENT (MSA)  This Master Services Agreement (“Agreement”) is entered into on 19 July 2024, by and between:  ABC Ltd., a company incorporated under the laws of India, having its registered office at Powai,  Mumbai.  AND  HCL1, a company incorporated under the laws of India, having its registered office at Mumbai,  Maharashtra, India.   Client and Service Provider are individually referred to as a “Party” and collectively as the “Parties.”  1. PURPOSE  This Agreement establishes the general terms and conditions under which Service Provider may  provide services to Client. Specific services shall be governed by one or more Statements of Work  (“SOW”) executed under this Agreement.  2. SCOPE OF SERVICES  2.1 Services shall be described in applicable SOWs, including scope, deliverables, milestones,  t imelines, and pricing.  2.2 Each SOW shall be subject to the terms of this Agreement unless expressly stated otherwise.  3. TERM AND TERMINATION  3.1 Term: This Agreement shall commence on the Effective Date and remain in force for 5 years,  unless terminated earlier.  3.2 Termination for Convenience: Either Party may terminate with 60 days’ written notice.  3.3 Termination for Cause: Either Party may terminate immediately for material breach not cured  within 30 days.  3.4 Upon termination, Client shall pay for all services rendered up to the termination date.  4. FEES AND PAYMENT  4.1 Fees shall be specified in the relevant SOW.  4.2 Invoices shall be paid within 45 days from invoice date.  4.3 Late payments may attract interest at 2% per month, subject to applicable law.  5. CHANGE MANAGEMENT  Any change to the scope, pricing, or timelines shall be documented through a mutually agreed  written change order.  6. CONFIDENTIALITY  6.1 Each Party agrees to protect confidential information disclosed by the other Party.  6.2 Confidential information shall not be disclosed to third parties without prior written consent,  except as required by law.  6.3 These obligations survive termination for 5 years.  7. INTELLECTUAL PROPERTY  7.1 Pre-existing IP remains the property of the owning Party.  7.2 Deliverables created under this Agreement shall be owned by HCL1, as specified in the SOW.  7.3 Each Party grants necessary licenses to use IP solely for performance under this Agreement.  8. REPRESENTATIONS AND WARRANTIES  Each Party represents that:   It has full authority to enter into this Agreement   Services will be performed in a professional and workmanlike manner   It will comply with all applicable laws and regulations  9. INDEMNIFICATION  Service Provider shall indemnify Client against claims arising from:   Breach of this Agreement   Gross negligence or willful misconduct   Infringement of third-party intellectual property rights  10. LIMITATION OF LIABILITY  Except for confidentiality breaches, IP infringement, or indemnification obligations, neither Party  shall be liable for indirect, incidental, or consequential damages. Total liability shall not exceed fees  paid in last 12 months.  11. INSURANCE  Service Provider shall maintain adequate insurance coverage including professional liability and  general liability, upon request.  12. GOVERNING LAW AND JURISDICTION  This Agreement shall be governed by the laws of Govt. of India, and courts of Mumbai shall have  exclusive jurisdiction.  13. FORCE MAJEURE  Neither Party shall be liable for failure to perform due to events beyond reasonable control, including  natural disasters, government actions, or pandemics.  14. ASSIGNMENT  Neither Party may assign this Agreement without prior written consent, except in case of merger or  acquisition.  15. INDEPENDENT CONTRACTORS  The Parties are independent contractors. Nothing creates a partnership, joint venture, or  employment relationship.  16. ENTIRE AGREEMENT  This Agreement, together with all SOWs, constitutes the entire agreement and supersedes all prior  discussions or agreements.  17. AMENDMENTS  Any amendment must be in writing and signed by authorized representatives of both Parties.  18. SIGNATURES  For ABC Ltd.  Name: Rusheel  Signature: Rusheel    Date: 19 July 2024  For  HCL1  Name: Parth  Signature: Parth  Date: 19 July 2024 ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "4bbad002-ecf0-4ea7-b691-c0b26a950a71",
+      "name": "Sample Documents",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        208
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "id": "c65d3e88-0ab9-48d5-ac4b-6a7e162b6ea3",
+      "name": "Vector Store (Insert)",
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "id": "5d5560a6-2ecb-4356-a552-6405a8307c09",
+      "name": "Document Loader",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "8792e1fe-3e13-4948-a792-48a1e17b56e1",
+      "name": "Recursive Text Splitter",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        176,
+        432
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "c14770f8-bd75-428e-9f72-9c515f493b1a",
+      "name": "Embeddings OpenAI (Insert)",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -32,
+        224
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 2
+            }
+          ]
+        }
+      },
+      "id": "db44f2f9-6dc9-4ceb-8e1d-a87d066ec6c3",
+      "name": "Schedule Trigger (Document Ingestion)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -480,
+        208
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Chat Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store (Retrieval)": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI (Query)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Store (Retrieval)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sample Documents": {
+      "main": [
+        [
+          {
+            "node": "Vector Store (Insert)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Document Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Vector Store (Insert)",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Document Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI (Insert)": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Vector Store (Insert)",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger (Document Ingestion)": {
+      "main": [
+        [
+          {
+            "node": "Sample Documents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "a89a8e4d-f959-4ff1-95fa-fdb2cc263f21",
+  "meta": {
+    "instanceId": "a32d89787d58cd8d475f4335b9d1d24ae757aa2351b55ba80263559a26d738c2"
+  },
+  "id": "E7fVUyVgtlZarQ1eqh5kx",
+  "tags": []
+}
