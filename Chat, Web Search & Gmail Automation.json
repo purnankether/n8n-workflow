@@ -1,0 +1,190 @@
+{
+  "name": "ChatGPTBot",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nMy name is Ether. How can I assist you today?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f2537e2b-9690-4092-8871-655b8186062d",
+      "name": "When chat message received",
+      "webhookId": "e9e5b26d-ad0e-4ddc-b93f-be04057012d0"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f180ef68-6e7b-4013-9451-d54f323dcd3a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        96,
+        224
+      ],
+      "id": "d5a1a0cb-0728-453d-bce0-a5243239fa0b",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        224
+      ],
+      "id": "34647afb-d23a-4aff-a013-0741061e0913",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolSerpApi",
+      "typeVersion": 1,
+      "position": [
+        448,
+        224
+      ],
+      "id": "f2ff8d28-448d-4413-9573-3c9412b3958c",
+      "name": "SerpAPI",
+      "notesInFlow": false,
+      "credentials": {
+        "serpApi": {
+          "id": "tYQxYOY6vCN54Y3X",
+          "name": "SerpAPI account"
+        }
+      },
+      "notes": "SerpAPI is only used for factual queries"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Use quirky subjects based on the data that you have. `, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `Start the message with the greeting but in quirky manner.\nThen dont complete all details in single paragraph.`, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        592,
+        208
+      ],
+      "id": "af957438-4c08-4781-9df8-0fc57bc75a93",
+      "name": "Send a message in Gmail",
+      "webhookId": "04a28d9c-d0ef-4dc7-8931-21d13acd3391",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "9Ck0FwotCDlviEji",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SerpAPI": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "78e15287-ddaa-4205-9fff-1b25b5ee8b46",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32d89787d58cd8d475f4335b9d1d24ae757aa2351b55ba80263559a26d738c2"
+  },
+  "id": "yiFfQUVORr12VkuQTRnWk",
+  "tags": []
+}
