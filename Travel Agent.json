@@ -1,0 +1,324 @@
+{
+  "name": "Travel Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "b47697cb-c8bb-4e28-9a13-497802f3d03a",
+      "name": "When chat message received",
+      "webhookId": "9f25a897-17d5-4258-829e-a9935d58c91a"
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You extract structured travel parameters from raw user messages.\n\nInput: free-form travel requests (may be incomplete or ambiguous).\n\nOutput: ONLY a JSON object matching the output parser schema.\n\nRules:\n- Extract origin, destination, dates or duration, travelers, tripType, budget, preferences, occasions, flexibility, urgency, groupType.\n- Infer missing values only when reasonable (based on standard travel norms).\n- Clearly distinguish inferred vs explicit values where applicable.\n- Do not hallucinate specific facts.\n- If unknown, return null or omit optional fields.\n- Preserve user intent.\n- Return JSON only. No explanations."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        160,
+        0
+      ],
+      "id": "e31d290f-da50-45ba-8970-db37db03408d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        208
+      ],
+      "id": "82c0aa53-e2d2-42d8-8e0a-b9928be2cd51",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"origin\": {\n      \"type\": \"string\",\n      \"description\": \"The origin city/location\"\n    },\n    \"destination\": {\n      \"type\": \"string\",\n      \"description\": \"The destination city/location\"\n    },\n    \"departure\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"description\": \"The departure date (YYYY-MM-DD)\"\n    },\n    \"return\": {\n      \"type\": \"string\",\n      \"format\": \"date\",\n      \"description\": \"The return date (YYYY-MM-DD)\"\n    },\n    \"duration\": {\n      \"type\": \"integer\",\n      \"description\": \"Trip duration in days (if specified instead of return date)\"\n    },\n    \"travelers\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"adults\": {\n          \"type\": \"integer\",\n          \"default\": 1,\n          \"description\": \"Number of adults\"\n        },\n        \"children\": {\n          \"type\": \"integer\",\n          \"default\": 0,\n          \"description\": \"Number of children\"\n        },\n        \"infants\": {\n          \"type\": \"integer\",\n          \"default\": 0,\n          \"description\": \"Number of infants\"\n        }\n      }\n    },\n    \"tripType\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"business\",\n        \"leisure\",\n        \"family\",\n        \"romantic\",\n        \"adventure\",\n        \"cultural\",\n        \"holiday\",\n        \"weekend\",\n        \"other\"\n      ],\n      \"description\": \"Type of trip mentioned\"\n    },\n    \"budget\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"amount\": {\n          \"type\": \"number\",\n          \"description\": \"Budget amount if mentioned\"\n        },\n        \"currency\": {\n          \"type\": \"string\",\n          \"description\": \"Currency (USD, EUR, GBP, etc.)\"\n        },\n        \"budgetLevel\": {\n          \"type\": \"string\",\n          \"enum\": [\n            \"budget\",\n            \"mid-range\",\n            \"luxury\",\n            \"ultra-luxury\"\n          ],\n          \"description\": \"Budget level if specific amount not given\"\n        }\n      }\n    },\n    \"preferences\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"accommodation\": {\n          \"type\": \"string\",\n          \"enum\": [\n            \"hotel\",\n            \"resort\",\n            \"hostel\",\n            \"airbnb\",\n            \"boutique\",\n            \"luxury\"\n          ],\n          \"description\": \"Preferred accommodation type\"\n        },\n        \"transportation\": {\n          \"type\": \"string\",\n          \"enum\": [\n            \"flight\",\n            \"train\",\n            \"car\",\n            \"bus\",\n            \"ferry\"\n          ],\n          \"description\": \"Preferred transportation method\"\n        },\n        \"activities\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\",\n            \"enum\": [\n              \"sightseeing\",\n              \"museums\",\n              \"nightlife\",\n              \"shopping\",\n              \"restaurants\",\n              \"beaches\",\n              \"nature\",\n              \"adventure\",\n              \"relaxation\",\n              \"culture\",\n              \"history\",\n              \"sports\"\n            ]\n          },\n          \"description\": \"Mentioned activity preferences\"\n        },\n        \"foodPreferences\": {\n          \"type\": \"array\",\n          \"items\": {\n            \"type\": \"string\"\n          },\n          \"description\": \"Dietary restrictions or food preferences mentioned\"\n        }\n      }\n    },\n    \"occasions\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\",\n        \"enum\": [\n          \"honeymoon\",\n          \"anniversary\",\n          \"birthday\",\n          \"graduation\",\n          \"retirement\",\n          \"business\",\n          \"conference\",\n          \"holiday\",\n          \"vacation\"\n        ]\n      },\n      \"description\": \"Special occasions mentioned\"\n    },\n    \"flexibility\": {\n      \"type\": \"object\",\n      \"properties\": {\n        \"dates\": {\n          \"type\": \"boolean\",\n          \"description\": \"Whether dates are flexible\"\n        },\n        \"destination\": {\n          \"type\": \"boolean\",\n          \"description\": \"Whether destination is flexible\"\n        },\n        \"budget\": {\n          \"type\": \"boolean\",\n          \"description\": \"Whether budget is flexible\"\n        }\n      }\n    },\n    \"urgency\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"immediate\",\n        \"soon\",\n        \"flexible\",\n        \"planning_ahead\"\n      ],\n      \"description\": \"How urgent the booking is\"\n    },\n    \"groupType\": {\n      \"type\": \"string\",\n      \"enum\": [\n        \"solo\",\n        \"couple\",\n        \"family\",\n        \"friends\",\n        \"business_group\",\n        \"large_group\"\n      ],\n      \"description\": \"Type of travel group\"\n    }\n  },\n  \"required\": [\"destination\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        304,
+        256
+      ],
+      "id": "8d64e6ed-d76a-4f27-816a-e1da9b136df3",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=={{ JSON.stringify($json.output) }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are a travel planning agent.\n\nInput is structured JSON travel data.\n\nUse tools Flights_Search, Activities, Accommodations (each at most once).\n\nReturn ONLY JSON matching the output parser schema.\n\nRules:\n- Max 3 flights.\n- Max 5 activities.\n- If info missing, use \"Not available\".\n- No retries.\n- No explanations.\n\nTool call rules (must follow exactly):\n\n- Activities_Search: call with {\"query\": \"<string>\", \"include_images\": true/false}\n\n- Hotels_Search: call with {\"q\": \"<string>\", \"check_in_date\": \"YYYY-MM-DD\", \"check_out_date\": \"YYYY-MM-DD\", \"adults\": <integer>}\n\n- Flights_Search: call with {\n    \"departure_id\": \"<value from origin_iata>\", \n    \"arrival_id\": \"<value from destination_iata>\", \n    \"outbound_date\": \"YYYY-MM-DD\", \n    \"return_date\": \"YYYY-MM-DD\"\n  }\n  (Note: You must map the input 'origin_iata' to the tool parameter 'departure_id'.)\nNever pass objects where strings are required. Never pass \"true\"/\"false\" as strings—use real booleans.\n\nExtract travel details from the user message into JSON.\n\nFor flights, always populate:\n- origin_iata and destination_iata as IATA 3-letter airport codes when the city is known.\nExamples: Bangalore->BLR, Mumbai->BOM, Delhi->DEL, Hyderabad->HYD, Chennai->MAA, Kolkata->CCU, Pune->PNQ.\n\nIf you cannot infer an IATA code, set origin_iata/destination_iata to an empty string \"\" (NOT \"Not available\").\nReturn only JSON matching the schema."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        656,
+        0
+      ],
+      "id": "63308a60-a184-4976-8184-c3648866d1f0",
+      "name": "Planner Agent"
+    },
+    {
+      "parameters": {
+        "schemaType": "manual",
+        "inputSchema": "{\n  \"destination\": \"string\",\n  \"origin\": \"string\",\n  \"departure_airport\": \"string (IATA 3-letter code)\",\n  \"arrival_airport\": \"string (IATA 3-letter code)\",\n  \"duration\": \"number\",\n  \"travelers\": {\n    \"adults\": \"number\",\n    \"children\": \"number\",\n    \"infants\": \"number\"\n  },\n  \"tripType\": \"string\",\n  \"groupType\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1088,
+        272
+      ],
+      "id": "d65d3a35-d60c-4340-9ee4-97180968d250",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        528,
+        192
+      ],
+      "id": "2f9d0454-2cea-475a-9d48-3d44107a362e",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "vhwIxqGnngCQGte8",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "google_flights",
+        "departure_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Departure_airport_code___location_kgmid__departure_id_', `departure_id must not be empty`, 'string') }}",
+        "arrival_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Arrival_airport_code___location_kgmid__arrival_id_', `arrival_id must not be empty`, 'string') }}",
+        "outbound_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Outbound_Date__outbound_date_', `The date departure (outbound_date) must not be from the past`, 'string') }}",
+        "return_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Return_Date__return_date_', `The date of return (return_date) must not be in the past and must be greater than outbound date`, 'string') }}",
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApiTool",
+      "typeVersion": 1,
+      "position": [
+        944,
+        352
+      ],
+      "id": "02ef95ac-a813-46b7-9cd6-a12b43268ebf",
+      "name": "Google_flights search in SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "tYQxYOY6vCN54Y3X",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "google_hotels",
+        "q": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Search_Query__q_', ``, 'string') }}",
+        "check_in_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Check-in_Date__check_in_date_', ``, 'string') }}",
+        "check_out_date": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Check-out_Date__check_out_date_', ``, 'string') }}",
+        "additionalFields": {},
+        "requestOptions": {}
+      },
+      "type": "n8n-nodes-serpapi.serpApiTool",
+      "typeVersion": 1,
+      "position": [
+        784,
+        352
+      ],
+      "id": "0aa70f24-a747-421d-afce-eff215386502",
+      "name": "Google_hotels search in SerpApi",
+      "credentials": {
+        "serpApi": {
+          "id": "tYQxYOY6vCN54Y3X",
+          "name": "SerpAPI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "query": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Query', ``, 'string') }}",
+        "options": {
+          "search_depth": "advanced",
+          "max_results": 2
+        }
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavilyTool",
+      "typeVersion": 1,
+      "position": [
+        624,
+        352
+      ],
+      "id": "fd6fd37d-9215-46af-a7de-5543621c135e",
+      "name": "Search in Tavily",
+      "credentials": {
+        "tavilyApi": {
+          "id": "O1LggTd6SDAzmXDK",
+          "name": "Tavily account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google_flights search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google_hotels search in SerpApi": {
+      "ai_tool": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search in Tavily": {
+      "ai_tool": [
+        [
+          {
+            "node": "Planner Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Planner Agent": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "f2f6927c-9cd6-48dd-af59-c1a229ea36f4",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a32d89787d58cd8d475f4335b9d1d24ae757aa2351b55ba80263559a26d738c2"
+  },
+  "id": "ByPiNSeJIlJdQ633-B4Fp",
+  "tags": []
+}
